@@ -35,7 +35,7 @@ export class Board {
 		"8": 7,
 	};
 
-    private positionConstantsForBlacks: { [key: string]: number } = {
+	private positionConstantsForBlacks: { [key: string]: number } = {
 		H: 7,
 		G: 6,
 		F: 5,
@@ -71,22 +71,26 @@ export class Board {
 		this.whosTurn = this.whosTurn === this.black ? this.white : this.black;
 	}
 
-	right(row: string, column: string): boolean {
-        const isWhitesTurn = this.whosTurn === this.white;
+	right(row: string, column: string): { everythingOk: boolean; hasOneMoreStep: boolean } {
+		const isWhitesTurn = this.whosTurn === this.white;
 
-		const rowIndex = isWhitesTurn ? this.positionConstantsForWhitess[row] : this.positionConstantsForBlacks[row];
-		const columnIndex = isWhitesTurn ? this.positionConstantsForWhitess[column] : this.positionConstantsForBlacks[column];
+		const rowIndex = isWhitesTurn
+			? this.positionConstantsForWhitess[row]
+			: this.positionConstantsForBlacks[row];
+		const columnIndex = isWhitesTurn
+			? this.positionConstantsForWhitess[column]
+			: this.positionConstantsForBlacks[column];
 
 		if (rowIndex === 0 || columnIndex === this.board.length - 1) {
-			return false;
+			return { everythingOk: false, hasOneMoreStep: false };
 		}
 
 		if (this.board[rowIndex][columnIndex] !== this.whosTurn) {
-			return false;
+			return { everythingOk: false, hasOneMoreStep: false };
 		}
 
 		if (this.board[rowIndex - 1][columnIndex + 1] === this.whosTurn) {
-			return false;
+			return { everythingOk: false, hasOneMoreStep: false };
 		}
 
 		if (
@@ -98,7 +102,7 @@ export class Board {
 				columnIndex + 2 >= this.board.length ||
 				this.board[rowIndex - 2][columnIndex + 2] !== " "
 			) {
-				return false;
+				return { everythingOk: false, hasOneMoreStep: false };
 			}
 			this.board[rowIndex][columnIndex] = " ";
 			this.board[rowIndex - 1][columnIndex + 1] = " ";
@@ -111,7 +115,10 @@ export class Board {
 				this.blackScore.push(this.white);
 			}
 
-			return true;
+			if (this.hasOneMoreStep(rowIndex - 2, columnIndex + 2)) {
+				return { everythingOk: true, hasOneMoreStep: true };
+			}
+			return { everythingOk: true, hasOneMoreStep: false };
 		}
 
 		const figure = this.board[rowIndex][columnIndex];
@@ -119,25 +126,29 @@ export class Board {
 
 		this.board[rowIndex - 1][columnIndex + 1] = figure;
 
-		return true;
+		return { everythingOk: true, hasOneMoreStep: false };
 	}
 
-	rightDown(row: string, column: string): boolean {
+	rightDown(row: string, column: string): { everythingOk: boolean; hasOneMoreStep: boolean } {
 		const isWhitesTurn = this.whosTurn === this.white;
 
-		const rowIndex = isWhitesTurn ? this.positionConstantsForWhitess[row] : this.positionConstantsForBlacks[row];
-		const columnIndex = isWhitesTurn ? this.positionConstantsForWhitess[column] : this.positionConstantsForBlacks[column];
+		const rowIndex = isWhitesTurn
+			? this.positionConstantsForWhitess[row]
+			: this.positionConstantsForBlacks[row];
+		const columnIndex = isWhitesTurn
+			? this.positionConstantsForWhitess[column]
+			: this.positionConstantsForBlacks[column];
 
 		if (rowIndex === this.board.length - 1 || columnIndex === this.board.length - 1) {
-			return false;
+			return { everythingOk: false, hasOneMoreStep: false }
 		}
 
 		if (this.board[rowIndex][columnIndex] !== this.whosTurn) {
-			return false;
+			return { everythingOk: false, hasOneMoreStep: false };
 		}
 
 		if (this.board[rowIndex + 1][columnIndex + 1] === this.whosTurn) {
-			return false;
+			return { everythingOk: false, hasOneMoreStep: false };
 		}
 
 		if (
@@ -149,7 +160,7 @@ export class Board {
 				columnIndex + 2 >= this.board.length ||
 				this.board[rowIndex + 2][columnIndex + 2] !== " "
 			) {
-				return false;
+				return { everythingOk: false, hasOneMoreStep: false };
 			}
 			this.board[rowIndex][columnIndex] = " ";
 			this.board[rowIndex + 1][columnIndex + 1] = " ";
@@ -162,28 +173,35 @@ export class Board {
 				this.blackScore.push(this.white);
 			}
 
-			return true;
+			if (this.hasOneMoreStep(rowIndex + 2, columnIndex + 2)) {
+				return { everythingOk: true, hasOneMoreStep: true };
+			}
+			return { everythingOk: true, hasOneMoreStep: false };
 		}
 
-		return false;
+		return { everythingOk: false, hasOneMoreStep: false };
 	}
 
-	left(row: string, column: string): boolean {
+	left(row: string, column: string): { everythingOk: boolean; hasOneMoreStep: boolean } {
 		const isWhitesTurn = this.whosTurn === this.white;
 
-		const rowIndex = isWhitesTurn ? this.positionConstantsForWhitess[row] : this.positionConstantsForBlacks[row];
-		const columnIndex = isWhitesTurn ? this.positionConstantsForWhitess[column] : this.positionConstantsForBlacks[column];
+		const rowIndex = isWhitesTurn
+			? this.positionConstantsForWhitess[row]
+			: this.positionConstantsForBlacks[row];
+		const columnIndex = isWhitesTurn
+			? this.positionConstantsForWhitess[column]
+			: this.positionConstantsForBlacks[column];
 
 		if (rowIndex === 0 || columnIndex === 0) {
-			return false;
+			return { everythingOk: false, hasOneMoreStep: false };
 		}
 
 		if (this.board[rowIndex][columnIndex] !== this.whosTurn) {
-			return false;
+			return { everythingOk: false, hasOneMoreStep: false };
 		}
 
 		if (this.board[rowIndex - 1][columnIndex - 1] === this.whosTurn) {
-			return false;
+			return { everythingOk: false, hasOneMoreStep: false };
 		}
 
 		if (
@@ -195,7 +213,7 @@ export class Board {
 				columnIndex - 2 <= 0 ||
 				this.board[rowIndex - 2][columnIndex - 2] !== " "
 			) {
-				return false;
+				return { everythingOk: false, hasOneMoreStep: false };
 			}
 			this.board[rowIndex][columnIndex] = " ";
 			this.board[rowIndex - 1][columnIndex - 1] = " ";
@@ -208,7 +226,10 @@ export class Board {
 				this.blackScore.push(this.white);
 			}
 
-			return true;
+			if (this.hasOneMoreStep(rowIndex - 2, columnIndex - 2)) {
+				return { everythingOk: true, hasOneMoreStep: true };
+			}
+			return { everythingOk: true, hasOneMoreStep: false };
 		}
 
 		const figure = this.board[rowIndex][columnIndex];
@@ -216,25 +237,29 @@ export class Board {
 
 		this.board[rowIndex - 1][columnIndex - 1] = figure;
 
-		return true;
+		return { everythingOk: true, hasOneMoreStep: false };
 	}
 
-	leftDown(row: string, column: string): boolean {
+	leftDown(row: string, column: string): { everythingOk: boolean; hasOneMoreStep: boolean } {
 		const isWhitesTurn = this.whosTurn === this.white;
 
-		const rowIndex = isWhitesTurn ? this.positionConstantsForWhitess[row] : this.positionConstantsForBlacks[row];
-		const columnIndex = isWhitesTurn ? this.positionConstantsForWhitess[column] : this.positionConstantsForBlacks[column];
+		const rowIndex = isWhitesTurn
+			? this.positionConstantsForWhitess[row]
+			: this.positionConstantsForBlacks[row];
+		const columnIndex = isWhitesTurn
+			? this.positionConstantsForWhitess[column]
+			: this.positionConstantsForBlacks[column];
 
 		if (rowIndex === this.board.length - 1 || columnIndex === 0) {
-			return false;
+			return { everythingOk: false, hasOneMoreStep: false };
 		}
 
 		if (this.board[rowIndex][columnIndex] !== this.whosTurn) {
-			return false;
+			return { everythingOk: false, hasOneMoreStep: false };
 		}
 
 		if (this.board[rowIndex + 1][columnIndex - 1] === this.whosTurn) {
-			return false;
+			return { everythingOk: false, hasOneMoreStep: false };
 		}
 
 		if (
@@ -246,7 +271,7 @@ export class Board {
 				columnIndex - 2 < 0 ||
 				this.board[rowIndex + 2][columnIndex - 2] !== " "
 			) {
-				return false;
+				return { everythingOk: false, hasOneMoreStep: false };
 			}
 			this.board[rowIndex][columnIndex] = " ";
 			this.board[rowIndex + 1][columnIndex - 1] = " ";
@@ -259,10 +284,13 @@ export class Board {
 				this.blackScore.push(this.white);
 			}
 
-			return true;
+			if (this.hasOneMoreStep(rowIndex + 2, columnIndex - 2)) {
+				return { everythingOk: true, hasOneMoreStep: true };
+			}
+			return { everythingOk: true, hasOneMoreStep: false };
 		}
 
-		return false;
+		return { everythingOk: false, hasOneMoreStep: false };
 	}
 
 	toString(): string {
@@ -272,14 +300,13 @@ export class Board {
 
 		str = str.concat(`${this.whosTurn === this.black ? "\tBlacks turn" : "\tWhites turn"}\n`);
 
-        const isBlacksTurn = this.whosTurn === this.black;
+		const isBlacksTurn = this.whosTurn === this.black;
 		if (isBlacksTurn) {
 			alphabetIndex = this.board.length - 1;
 		}
 		for (let row = 0; row < this.board.length; row++) {
 			for (let column = -1; column < this.board.length; column++) {
 				if (column === -1) {
-
 					str = str.concat(`${alphabet[isBlacksTurn ? alphabetIndex-- : alphabetIndex++]}`);
 				} else {
 					str = str.concat(`[${this.board[row][column]}]`);
@@ -288,7 +315,7 @@ export class Board {
 
 			str = str.concat("\n");
 		}
-        
+
 		str = str.concat(isBlacksTurn ? "  8  7  6  5  4  3  2  1 " : "  1  2  3  4  5  6  7  8 ");
 
 		str = str.concat("\n");
@@ -304,6 +331,52 @@ export class Board {
 		});
 
 		return str;
+	}
+
+	hasOneMoreStep(row: number, column: number): boolean {
+		const opponent = this.whosTurn === this.black ? this.white : this.black;
+        
+        //check right side
+		if (
+			row - 2 >= 0 &&
+			column + 2 < this.board.length &&
+			this.board[row - 1][column + 1] === opponent &&
+            this.board[row - 2][column + 2] === " "
+		) {
+            return true;
+		}
+
+        //check left side
+        if (
+            row - 2 >= 0 &&
+            column - 2 >= 0 &&
+            this.board[row - 1][column - 1] === opponent &&
+            this.board[row - 2][column - 2] === " "
+        ) {
+            return true;
+        }
+
+        //check rightDown side
+		if (
+			row + 2 < this.board.length &&
+			column + 2 < this.board.length &&
+			this.board[row + 1][column + 1] === opponent &&
+            this.board[row + 2][column + 2] === " "
+		) {
+            return true;
+		}
+
+        //check leftDown side
+        if (
+            row + 2 < this.board.length &&
+            column - 2 >= 0 &&
+            this.board[row + 1][column - 1] === opponent &&
+            this.board[row + 2][column - 2] === " "
+        ) {
+            return true;
+        }
+
+        return false;
 	}
 
 	displayWinner(): boolean {

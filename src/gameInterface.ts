@@ -25,6 +25,7 @@ export class GameInterface {
 		let countOfPreviousLines = 12;
         let cautionMessage = "";
         const rowChars: string[] = ['H', 'G', 'F', 'E', 'D', 'C', 'B', 'A'];
+        let goToNextPlayer: { everythingOk: boolean; hasOneMoreStep: boolean } = {everythingOk: false, hasOneMoreStep: false};
 
 		while (this.board.displayWinner()) {
 			this.clearConsole();
@@ -58,7 +59,6 @@ export class GameInterface {
                 }
             }
 
-			let goToNextPlayer: boolean = false;
 
 			switch (comandsArr[1]) {
 				case "R": {
@@ -86,8 +86,9 @@ export class GameInterface {
 					console.log("WRONG KEY!!");
 				}
 			}
-
-			if (goToNextPlayer) {
+            if (goToNextPlayer.hasOneMoreStep) {
+                cautionMessage = "You have one more step";
+            } else if (goToNextPlayer.everythingOk) {
 				this.board.rotateBoard();
 			} else {
                 cautionMessage = "WRONG OPERATION!!!"
