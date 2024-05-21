@@ -2,17 +2,21 @@ import { Board } from "./board";
 
 import { GameInterface } from "./gameInterface";
 
-// let board = new Board();
+let board = new Board();
 // board.display();
 // board.right('C', '1');
 // board.display();
-// board.right('C', '3');
-// board.display();
+
 // board.rotateBoard();
+// board.right('F', '8');
 // board.display();
-// board.left('C', '5');
+
+// board.rotateBoard();
+// board.left('D', '2');
 // board.display();
-// board.left('C', '3');
+
+// board.rotateBoard();
+// console.log(board.left('E', '2'));
 // board.display();
 // board.leftDown('D', '4');
 // board.display();
