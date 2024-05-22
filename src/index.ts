@@ -2,7 +2,8 @@ import { Board } from "./board";
 
 import { GameInterface } from "./gameInterface";
 
-let board = new Board();
+// let board = new Board();
+// board.board[][]
 // board.display();
 // board.right('C', '3');
 // board.right('D', '4');
