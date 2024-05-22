@@ -227,7 +227,7 @@ export class Board {
 		) {
 			if (
 				rowIndex - 2 < 0 ||
-				columnIndex - 2 <= 0 ||
+				columnIndex - 2 < 0 ||
 				this.board[rowIndex - 2][columnIndex - 2] !== " "
 			) {
 				return { everythingOk: false, hasOneMoreStep: false };
