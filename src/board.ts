@@ -1,8 +1,10 @@
+import { BlobOptions } from "buffer";
+
 export class Board {
 	private readonly white = "●";
 	private readonly black = "○";
-	private readonly whiteQueen = "ϴ";
-	private readonly blackQueen = "Q";
+	private readonly whiteQueen = "⛃";
+	private readonly blackQueen = "⛁";
 	private readonly space = " ";
 
 	private whosTurn = this.white;
@@ -191,7 +193,7 @@ export class Board {
 			this.becomeQueen(rowIndex - 2, columnIndex + 2);
 
 			//addScore
-			this.whiteScore.push(opponentQueen ? opponentQueen : opponentFigure);
+			this.addScore(opponentQueen ? opponentQueen : opponentFigure);
 
 			//if figure is in the front edge of the board it becomes queen
 			this.becomeQueen(rowIndex - 2, columnIndex + 2);
@@ -235,9 +237,13 @@ export class Board {
 			return { everythingOk: false, hasOneMoreStep: false };
 		}
 
+		let opponentFigure = this.whosTurn === this.black ? this.white : this.black;
+		let opponentQueen;
+
 		if (
+			this.board[rowIndex + 1][columnIndex + 1] === opponentFigure ||
 			this.board[rowIndex + 1][columnIndex + 1] ===
-			(this.whosTurn === this.black ? this.white : this.black)
+				(opponentQueen = this.whosTurn === this.black ? this.whiteQueen : this.blackQueen)
 		) {
 			if (
 				rowIndex + 2 >= this.board.length ||
@@ -254,11 +260,7 @@ export class Board {
 			this.becomeQueen(rowIndex + 2, columnIndex + 2);
 
 			//addScore
-			if (this.whosTurn === this.white) {
-				this.whiteScore.push(this.black);
-			} else {
-				this.blackScore.push(this.white);
-			}
+			this.addScore(opponentQueen ? opponentQueen : opponentFigure);
 
 			//if figure is in the front edge of the board it becomes queen
 			this.becomeQueen(rowIndex + 2, columnIndex + 2);
@@ -294,9 +296,13 @@ export class Board {
 			return { everythingOk: false, hasOneMoreStep: false };
 		}
 
+		let opponentFigure = this.whosTurn === this.black ? this.white : this.black;
+		let opponentQueen;
+
 		if (
+			this.board[rowIndex - 1][columnIndex - 1] === opponentFigure ||
 			this.board[rowIndex - 1][columnIndex - 1] ===
-			(this.whosTurn === this.black ? this.white : this.black)
+				(opponentQueen = this.whosTurn === this.black ? this.whiteQueen : this.blackQueen)
 		) {
 			if (
 				rowIndex - 2 < 0 ||
@@ -313,11 +319,7 @@ export class Board {
 			this.becomeQueen(rowIndex - 2, columnIndex - 2);
 
 			//addScore
-			if (this.whosTurn === this.white) {
-				this.whiteScore.push(this.black);
-			} else {
-				this.blackScore.push(this.white);
-			}
+			this.addScore(opponentQueen ? opponentQueen : opponentFigure);
 
 			if (this.hasOneMoreStep(rowIndex - 2, columnIndex - 2)) {
 				return { everythingOk: true, hasOneMoreStep: true };
@@ -357,9 +359,13 @@ export class Board {
 			return { everythingOk: false, hasOneMoreStep: false };
 		}
 
+		let opponentFigure = this.whosTurn === this.black ? this.white : this.black;
+		let opponentQueen;
+
 		if (
+			this.board[rowIndex + 1][columnIndex - 1] === opponentFigure ||
 			this.board[rowIndex + 1][columnIndex - 1] ===
-			(this.whosTurn === this.black ? this.white : this.black)
+				(opponentQueen = this.whosTurn === this.black ? this.whiteQueen : this.blackQueen)
 		) {
 			if (
 				rowIndex + 2 >= this.board.length ||
@@ -376,11 +382,7 @@ export class Board {
 			this.becomeQueen(rowIndex + 2, columnIndex - 2);
 
 			//addScore
-			if (this.whosTurn === this.white) {
-				this.whiteScore.push(this.black);
-			} else {
-				this.blackScore.push(this.white);
-			}
+			this.addScore(opponentQueen ? opponentQueen : opponentFigure);
 
 			if (this.hasOneMoreStep(rowIndex + 2, columnIndex - 2)) {
 				return { everythingOk: true, hasOneMoreStep: true };
@@ -438,10 +440,12 @@ export class Board {
 			return { everythingOk: false, hasOneMoreStep: false };
 		}
 
-		//check if there is possible move
+		//making a move
 		let indexRow = 0;
 		let indexColumn = 0;
 		let eatableOpponent: string = "";
+        let doesQueenAteSomeone = false;
+
 		if (fromRowIndex < toRowIndex) {
 			indexRow = fromRowIndex + 1;
 			if (fromColumnIndex < toColumnIndex) {
@@ -451,6 +455,7 @@ export class Board {
 					indexColumn <= toColumnIndex && indexRow <= toRowIndex;
 					indexColumn++
 				) {
+
 					if (
 						this.board[indexRow][indexColumn] === (eatableOpponent = opponentFigure) ||
 						this.board[indexRow][indexColumn] === (eatableOpponent = opponentQueen)
@@ -458,11 +463,8 @@ export class Board {
 						//eat
 						if (indexRow + 1 < this.board.length && indexColumn + 1 < this.board.length) {
 							if (this.board[indexRow + 1][indexColumn + 1] === this.space) {
-								if (this.whosTurn === this.white) {
-									this.whiteScore.push(eatableOpponent);
-								} else {
-									this.blackScore.push(eatableOpponent);
-								}
+								this.addScore(eatableOpponent);
+
 								//remove opponents figure
 								this.board[indexRow][indexColumn] = this.space;
 								//remove my figure from its previous place
@@ -471,6 +473,7 @@ export class Board {
 								this.board[indexRow + 1][indexColumn + 1] = queenFigure;
 								++indexRow;
 								++indexColumn;
+                                doesQueenAteSomeone = true;
 							}
 						}
 					} else if (this.board[indexRow][indexColumn] !== this.space) {
@@ -479,7 +482,7 @@ export class Board {
 						this.board[indexRow - 1][indexColumn - 1] = this.space;
 						this.board[indexRow][indexColumn] = queenFigure;
 					}
-
+                    
 					indexRow++;
 				}
 			} else {
@@ -489,6 +492,7 @@ export class Board {
 					indexColumn >= toColumnIndex && indexRow <= toRowIndex;
 					indexColumn--
 				) {
+                    
 					if (
 						this.board[indexRow][indexColumn] === (eatableOpponent = opponentFigure) ||
 						this.board[indexRow][indexColumn] === (eatableOpponent = opponentQueen)
@@ -496,11 +500,8 @@ export class Board {
 						//eat
 						if (indexRow + 1 < this.board.length && indexColumn - 1 >= 0) {
 							if (this.board[indexRow + 1][indexColumn - 1] === this.space) {
-								if (this.whosTurn === this.white) {
-									this.whiteScore.push(eatableOpponent);
-								} else {
-									this.blackScore.push(eatableOpponent);
-								}
+								this.addScore(eatableOpponent);
+
 								//remove opponents figure
 								this.board[indexRow][indexColumn] = this.space;
 								//remove my figure from its previous place
@@ -509,6 +510,7 @@ export class Board {
 								this.board[indexRow + 1][indexColumn - 1] = queenFigure;
 								++indexRow;
 								--indexColumn;
+                                doesQueenAteSomeone = true;
 							}
 						}
 					} else if (this.board[indexRow][indexColumn] !== this.space) {
@@ -536,11 +538,8 @@ export class Board {
 						//eat
 						if (indexRow - 1 >= 0 && indexColumn + 1 < this.board.length) {
 							if (this.board[indexRow - 1][indexColumn + 1] === this.space) {
-								if (this.whosTurn === this.white) {
-									this.whiteScore.push(eatableOpponent);
-								} else {
-									this.blackScore.push(eatableOpponent);
-								}
+								this.addScore(eatableOpponent);
+
 								//remove opponents figure
 								this.board[indexRow][indexColumn] = this.space;
 								//remove my figure from its previous place
@@ -549,6 +548,7 @@ export class Board {
 								this.board[indexRow - 1][indexColumn + 1] = queenFigure;
 								--indexRow;
 								++indexColumn;
+                                doesQueenAteSomeone = true;
 							}
 						}
 					} else if (this.board[indexRow][indexColumn] !== this.space) {
@@ -573,11 +573,9 @@ export class Board {
 						//eat
 						if (indexRow - 1 >= 0 && indexColumn - 1 >= 0) {
 							if (this.board[indexRow - 1][indexColumn - 1] === this.space) {
-								if (this.whosTurn === this.white) {
-									this.whiteScore.push(eatableOpponent);
-								} else {
-									this.blackScore.push(eatableOpponent);
-								}
+								//add score
+								this.addScore(eatableOpponent);
+
 								//remove opponents figure
 								this.board[indexRow][indexColumn] = this.space;
 								//remove my figure from its previous place
@@ -586,6 +584,8 @@ export class Board {
 								this.board[indexRow - 1][indexColumn - 1] = queenFigure;
 								--indexRow;
 								--indexColumn;
+                                
+                                doesQueenAteSomeone = true;
 							}
 						}
 					} else if (this.board[indexRow][indexColumn] !== this.space) {
@@ -598,7 +598,9 @@ export class Board {
 				}
 			}
 		}
-
+        if (doesQueenAteSomeone && this.queenHasOneMoreStep(indexRow, indexColumn)) {
+            return {everythingOk: true, hasOneMoreStep: true}
+        }
 		return { everythingOk: true, hasOneMoreStep: false };
 	}
 
@@ -656,14 +658,23 @@ export class Board {
 		return str;
 	}
 
+	addScore(opponent: string): void {
+		if (this.whosTurn === this.white) {
+			this.whiteScore.push(opponent);
+		} else {
+			this.blackScore.push(opponent);
+		}
+	}
+
 	hasOneMoreStep(row: number, column: number): boolean {
 		const opponent = this.whosTurn === this.black ? this.white : this.black;
-
+		const opponentQueen = this.whosTurn === this.black ? this.whiteQueen : this.blackQueen;
 		//check right side
 		if (
 			row - 2 >= 0 &&
 			column + 2 < this.board.length &&
-			this.board[row - 1][column + 1] === opponent &&
+			(this.board[row - 1][column + 1] === opponent ||
+				this.board[row - 1][column + 1] === opponentQueen) &&
 			this.board[row - 2][column + 2] === this.space
 		) {
 			return true;
@@ -673,7 +684,8 @@ export class Board {
 		if (
 			row - 2 >= 0 &&
 			column - 2 >= 0 &&
-			this.board[row - 1][column - 1] === opponent &&
+			(this.board[row - 1][column - 1] === opponent ||
+				this.board[row - 1][column - 1] === opponentQueen) &&
 			this.board[row - 2][column - 2] === this.space
 		) {
 			return true;
@@ -683,7 +695,8 @@ export class Board {
 		if (
 			row + 2 < this.board.length &&
 			column + 2 < this.board.length &&
-			this.board[row + 1][column + 1] === opponent &&
+			(this.board[row + 1][column + 1] === opponent ||
+				this.board[row + 1][column + 1] === opponentQueen) &&
 			this.board[row + 2][column + 2] === this.space
 		) {
 			return true;
@@ -693,10 +706,86 @@ export class Board {
 		if (
 			row + 2 < this.board.length &&
 			column - 2 >= 0 &&
-			this.board[row + 1][column - 1] === opponent &&
+			(this.board[row + 1][column - 1] === opponent ||
+				this.board[row + 1][column - 1] === opponentQueen) &&
 			this.board[row + 2][column - 2] === this.space
 		) {
 			return true;
+		}
+
+		return false;
+	}
+
+	queenHasOneMoreStep(row: number, column: number): boolean {
+		const opponent = this.whosTurn === this.black ? this.white : this.black;
+		const opponentQueen = this.whosTurn === this.black ? this.whiteQueen : this.blackQueen;
+
+		//right
+		if (row !== 0) {
+			//right up
+            for (
+				let rowIndex = row - 1, columnIndex = column + 1;
+				rowIndex > 0 && columnIndex < this.board.length - 1;
+				rowIndex--, columnIndex++
+			) {
+				let checkBox = this.board[rowIndex][columnIndex];
+                let nextCheckBox = this.board[rowIndex - 1][columnIndex + 1];
+
+				if (checkBox !== this.space) {
+					if ((checkBox === opponent || checkBox === opponentQueen) && nextCheckBox === this.space) {
+                        return true;
+                    }
+				}
+			}
+			//right down
+            for (
+				let rowIndex = row + 1, columnIndex = column + 1;
+				rowIndex < this.board.length - 1 && columnIndex < this.board.length - 1;
+				rowIndex++, columnIndex++
+			) {
+				let checkBox = this.board[rowIndex][columnIndex];
+                let nextCheckBox = this.board[rowIndex + 1][columnIndex + 1];
+
+				if (checkBox !== this.space) {
+					if ((checkBox === opponent || checkBox === opponentQueen) && nextCheckBox === this.space) {
+                        return true;
+                    }
+				}
+			}
+		}
+
+		//left
+		if (row !== this.board.length - 1) {
+			//left up
+			for (
+				let rowIndex = row - 1, columnIndex = column - 1;
+				rowIndex > 0 && columnIndex > 0;
+				rowIndex--, columnIndex--
+			) {
+				let checkBox = this.board[rowIndex][columnIndex];
+                let nextCheckBox = this.board[rowIndex - 1][columnIndex - 1];
+
+				if (checkBox !== this.space) {
+					if ((checkBox === opponent || checkBox === opponentQueen) && nextCheckBox === this.space) {
+                        return true;
+                    }
+				}
+			}
+			//left down
+            for (
+				let rowIndex = row + 1, columnIndex = column - 1;
+				rowIndex < this.board.length - 1 && columnIndex > 0;
+				rowIndex++, columnIndex--
+			) {
+				let checkBox = this.board[rowIndex][columnIndex];
+                let nextCheckBox = this.board[rowIndex + 1][columnIndex - 1];
+
+				if (checkBox !== this.space) {
+					if ((checkBox === opponent || checkBox === opponentQueen) && nextCheckBox === this.space) {
+                        return true;
+                    }
+				}
+			}
 		}
 
 		return false;
