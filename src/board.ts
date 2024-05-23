@@ -1,23 +1,96 @@
 export class Board {
-	private white = "●";
-	private black = "O";
-	private whiteQueen = "ϴ";
-	private blackQueen = "Q";
+	private readonly white = "●";
+	private readonly black = "○";
+	private readonly whiteQueen = "ϴ";
+	private readonly blackQueen = "Q";
+	private readonly space = " ";
 
 	private whosTurn = this.white;
 
 	private board: string[][] = [
-		[" ", "O", " ", "O", " ", "O", " ", "O"],
-		["O", " ", "O", " ", "O", " ", "O", " "],
-		[" ", "O", " ", "O", " ", "O", " ", "O"],
-		[" ", " ", " ", " ", " ", " ", " ", " "],
-		[" ", " ", " ", " ", " ", " ", " ", " "],
-		["●", " ", "●", " ", "●", " ", "●", " "],
-		[" ", "●", " ", "●", " ", "●", " ", "●"],
-		["●", " ", "●", " ", "●", " ", "●", " "],
+		[
+			this.space,
+			this.black,
+			this.space,
+			this.black,
+			this.space,
+			this.black,
+			this.space,
+			this.black,
+		],
+		[
+			this.black,
+			this.space,
+			this.black,
+			this.space,
+			this.black,
+			this.space,
+			this.black,
+			this.space,
+		],
+		[
+			this.space,
+			this.black,
+			this.space,
+			this.black,
+			this.space,
+			this.black,
+			this.space,
+			this.black,
+		],
+		[
+			this.space,
+			this.space,
+			this.space,
+			this.space,
+			this.space,
+			this.space,
+			this.space,
+			this.space,
+		],
+		[
+			this.space,
+			this.space,
+			this.space,
+			this.space,
+			this.space,
+			this.space,
+			this.space,
+			this.space,
+		],
+		[
+			this.white,
+			this.space,
+			this.white,
+			this.space,
+			this.white,
+			this.space,
+			this.white,
+			this.space,
+		],
+		[
+			this.space,
+			this.white,
+			this.space,
+			this.white,
+			this.space,
+			this.white,
+			this.space,
+			this.white,
+		],
+		[
+			this.white,
+			this.space,
+			this.white,
+			this.space,
+			this.white,
+			this.space,
+			this.white,
+			this.space,
+		],
 	];
 
-	private positionConstantsForWhitess: { [key: string]: number } = {
+	private readonly positionConstantsForWhitess: { [key: string]: number } = {
 		H: 0,
 		G: 1,
 		F: 2,
@@ -37,7 +110,7 @@ export class Board {
 		"8": 7,
 	};
 
-	private positionConstantsForBlacks: { [key: string]: number } = {
+	private readonly positionConstantsForBlacks: { [key: string]: number } = {
 		H: 7,
 		G: 6,
 		F: 5,
@@ -95,30 +168,30 @@ export class Board {
 			return { everythingOk: false, hasOneMoreStep: false };
 		}
 
+		let opponentFigure = this.whosTurn === this.black ? this.white : this.black;
+		let opponentQueen;
+
 		if (
+			this.board[rowIndex - 1][columnIndex + 1] === opponentFigure ||
 			this.board[rowIndex - 1][columnIndex + 1] ===
-			(this.whosTurn === this.black ? this.white : this.black)
+				(opponentQueen = this.whosTurn === this.black ? this.whiteQueen : this.blackQueen)
 		) {
 			if (
 				rowIndex - 2 < 0 ||
 				columnIndex + 2 >= this.board.length ||
-				this.board[rowIndex - 2][columnIndex + 2] !== " "
+				this.board[rowIndex - 2][columnIndex + 2] !== this.space
 			) {
 				return { everythingOk: false, hasOneMoreStep: false };
 			}
-			this.board[rowIndex][columnIndex] = " ";
-			this.board[rowIndex - 1][columnIndex + 1] = " ";
+			this.board[rowIndex][columnIndex] = this.space;
+			this.board[rowIndex - 1][columnIndex + 1] = this.space;
 			this.board[rowIndex - 2][columnIndex + 2] = this.whosTurn;
 
 			//if figure is in the front edge of the board it becomes queen
 			this.becomeQueen(rowIndex - 2, columnIndex + 2);
 
 			//addScore
-			if (this.whosTurn === this.white) {
-				this.whiteScore.push(this.black);
-			} else {
-				this.blackScore.push(this.white);
-			}
+			this.whiteScore.push(opponentQueen ? opponentQueen : opponentFigure);
 
 			//if figure is in the front edge of the board it becomes queen
 			this.becomeQueen(rowIndex - 2, columnIndex + 2);
@@ -130,7 +203,7 @@ export class Board {
 		}
 
 		const figure = this.board[rowIndex][columnIndex];
-		this.board[rowIndex][columnIndex] = " ";
+		this.board[rowIndex][columnIndex] = this.space;
 
 		this.board[rowIndex - 1][columnIndex + 1] = figure;
 
@@ -169,12 +242,12 @@ export class Board {
 			if (
 				rowIndex + 2 >= this.board.length ||
 				columnIndex + 2 >= this.board.length ||
-				this.board[rowIndex + 2][columnIndex + 2] !== " "
+				this.board[rowIndex + 2][columnIndex + 2] !== this.space
 			) {
 				return { everythingOk: false, hasOneMoreStep: false };
 			}
-			this.board[rowIndex][columnIndex] = " ";
-			this.board[rowIndex + 1][columnIndex + 1] = " ";
+			this.board[rowIndex][columnIndex] = this.space;
+			this.board[rowIndex + 1][columnIndex + 1] = this.space;
 			this.board[rowIndex + 2][columnIndex + 2] = this.whosTurn;
 
 			//if figure is in the front edge of the board it becomes queen
@@ -228,12 +301,12 @@ export class Board {
 			if (
 				rowIndex - 2 < 0 ||
 				columnIndex - 2 < 0 ||
-				this.board[rowIndex - 2][columnIndex - 2] !== " "
+				this.board[rowIndex - 2][columnIndex - 2] !== this.space
 			) {
 				return { everythingOk: false, hasOneMoreStep: false };
 			}
-			this.board[rowIndex][columnIndex] = " ";
-			this.board[rowIndex - 1][columnIndex - 1] = " ";
+			this.board[rowIndex][columnIndex] = this.space;
+			this.board[rowIndex - 1][columnIndex - 1] = this.space;
 			this.board[rowIndex - 2][columnIndex - 2] = this.whosTurn;
 
 			//if figure is in the front edge of the board it becomes queen
@@ -253,7 +326,7 @@ export class Board {
 		}
 
 		const figure = this.board[rowIndex][columnIndex];
-		this.board[rowIndex][columnIndex] = " ";
+		this.board[rowIndex][columnIndex] = this.space;
 
 		this.board[rowIndex - 1][columnIndex - 1] = figure;
 
@@ -291,16 +364,16 @@ export class Board {
 			if (
 				rowIndex + 2 >= this.board.length ||
 				columnIndex - 2 < 0 ||
-				this.board[rowIndex + 2][columnIndex - 2] !== " "
+				this.board[rowIndex + 2][columnIndex - 2] !== this.space
 			) {
 				return { everythingOk: false, hasOneMoreStep: false };
 			}
-			this.board[rowIndex][columnIndex] = " ";
-			this.board[rowIndex + 1][columnIndex - 1] = " ";
+			this.board[rowIndex][columnIndex] = this.space;
+			this.board[rowIndex + 1][columnIndex - 1] = this.space;
 			this.board[rowIndex + 2][columnIndex - 2] = this.whosTurn;
 
-            //if figure is in the front edge of the board it becomes queen
-            this.becomeQueen((rowIndex + 2), (columnIndex - 2));
+			//if figure is in the front edge of the board it becomes queen
+			this.becomeQueen(rowIndex + 2, columnIndex - 2);
 
 			//addScore
 			if (this.whosTurn === this.white) {
@@ -384,26 +457,26 @@ export class Board {
 					) {
 						//eat
 						if (indexRow + 1 < this.board.length && indexColumn + 1 < this.board.length) {
-							if (this.board[indexRow + 1][indexColumn + 1] === " ") {
+							if (this.board[indexRow + 1][indexColumn + 1] === this.space) {
 								if (this.whosTurn === this.white) {
 									this.whiteScore.push(eatableOpponent);
 								} else {
 									this.blackScore.push(eatableOpponent);
 								}
 								//remove opponents figure
-								this.board[indexRow][indexColumn] = " ";
+								this.board[indexRow][indexColumn] = this.space;
 								//remove my figure from its previous place
-								this.board[indexRow - 1][indexColumn - 1] = " ";
+								this.board[indexRow - 1][indexColumn - 1] = this.space;
 								//place it one step over opponents figure
 								this.board[indexRow + 1][indexColumn + 1] = queenFigure;
 								++indexRow;
 								++indexColumn;
 							}
 						}
-					} else if (this.board[indexRow][indexColumn] !== " ") {
+					} else if (this.board[indexRow][indexColumn] !== this.space) {
 						return { everythingOk: false, hasOneMoreStep: false };
 					} else {
-						this.board[indexRow - 1][indexColumn - 1] = " ";
+						this.board[indexRow - 1][indexColumn - 1] = this.space;
 						this.board[indexRow][indexColumn] = queenFigure;
 					}
 
@@ -422,26 +495,26 @@ export class Board {
 					) {
 						//eat
 						if (indexRow + 1 < this.board.length && indexColumn - 1 >= 0) {
-							if (this.board[indexRow + 1][indexColumn - 1] === " ") {
+							if (this.board[indexRow + 1][indexColumn - 1] === this.space) {
 								if (this.whosTurn === this.white) {
 									this.whiteScore.push(eatableOpponent);
 								} else {
 									this.blackScore.push(eatableOpponent);
 								}
 								//remove opponents figure
-								this.board[indexRow][indexColumn] = " ";
+								this.board[indexRow][indexColumn] = this.space;
 								//remove my figure from its previous place
-								this.board[indexRow - 1][indexColumn + 1] = " ";
+								this.board[indexRow - 1][indexColumn + 1] = this.space;
 								//place it one step over opponents figure
 								this.board[indexRow + 1][indexColumn - 1] = queenFigure;
 								++indexRow;
 								--indexColumn;
 							}
 						}
-					} else if (this.board[indexRow][indexColumn] !== " ") {
+					} else if (this.board[indexRow][indexColumn] !== this.space) {
 						return { everythingOk: false, hasOneMoreStep: false };
 					} else {
-						this.board[indexRow - 1][indexColumn + 1] = " ";
+						this.board[indexRow - 1][indexColumn + 1] = this.space;
 						this.board[indexRow][indexColumn] = queenFigure;
 					}
 					indexRow++;
@@ -462,26 +535,26 @@ export class Board {
 					) {
 						//eat
 						if (indexRow - 1 >= 0 && indexColumn + 1 < this.board.length) {
-							if (this.board[indexRow - 1][indexColumn + 1] === " ") {
+							if (this.board[indexRow - 1][indexColumn + 1] === this.space) {
 								if (this.whosTurn === this.white) {
 									this.whiteScore.push(eatableOpponent);
 								} else {
 									this.blackScore.push(eatableOpponent);
 								}
 								//remove opponents figure
-								this.board[indexRow][indexColumn] = " ";
+								this.board[indexRow][indexColumn] = this.space;
 								//remove my figure from its previous place
-								this.board[indexRow + 1][indexColumn - 1] = " ";
+								this.board[indexRow + 1][indexColumn - 1] = this.space;
 								//place it one step over opponents figure
 								this.board[indexRow - 1][indexColumn + 1] = queenFigure;
 								--indexRow;
 								++indexColumn;
 							}
 						}
-					} else if (this.board[indexRow][indexColumn] !== " ") {
+					} else if (this.board[indexRow][indexColumn] !== this.space) {
 						return { everythingOk: false, hasOneMoreStep: false };
 					} else {
-						this.board[indexRow + 1][indexColumn - 1] = " ";
+						this.board[indexRow + 1][indexColumn - 1] = this.space;
 						this.board[indexRow][indexColumn] = queenFigure;
 					}
 					indexRow--;
@@ -499,26 +572,26 @@ export class Board {
 					) {
 						//eat
 						if (indexRow - 1 >= 0 && indexColumn - 1 >= 0) {
-							if (this.board[indexRow - 1][indexColumn - 1] === " ") {
+							if (this.board[indexRow - 1][indexColumn - 1] === this.space) {
 								if (this.whosTurn === this.white) {
 									this.whiteScore.push(eatableOpponent);
 								} else {
 									this.blackScore.push(eatableOpponent);
 								}
 								//remove opponents figure
-								this.board[indexRow][indexColumn] = " ";
+								this.board[indexRow][indexColumn] = this.space;
 								//remove my figure from its previous place
-								this.board[indexRow + 1][indexColumn + 1] = " ";
+								this.board[indexRow + 1][indexColumn + 1] = this.space;
 								//place it one step over opponents figure
 								this.board[indexRow - 1][indexColumn - 1] = queenFigure;
 								--indexRow;
 								--indexColumn;
 							}
 						}
-					} else if (this.board[indexRow][indexColumn] !== " ") {
+					} else if (this.board[indexRow][indexColumn] !== this.space) {
 						return { everythingOk: false, hasOneMoreStep: false };
 					} else {
-						this.board[indexRow + 1][indexColumn + 1] = " ";
+						this.board[indexRow + 1][indexColumn + 1] = this.space;
 						this.board[indexRow][indexColumn] = queenFigure;
 					}
 					indexRow--;
@@ -591,7 +664,7 @@ export class Board {
 			row - 2 >= 0 &&
 			column + 2 < this.board.length &&
 			this.board[row - 1][column + 1] === opponent &&
-			this.board[row - 2][column + 2] === " "
+			this.board[row - 2][column + 2] === this.space
 		) {
 			return true;
 		}
@@ -601,7 +674,7 @@ export class Board {
 			row - 2 >= 0 &&
 			column - 2 >= 0 &&
 			this.board[row - 1][column - 1] === opponent &&
-			this.board[row - 2][column - 2] === " "
+			this.board[row - 2][column - 2] === this.space
 		) {
 			return true;
 		}
@@ -611,7 +684,7 @@ export class Board {
 			row + 2 < this.board.length &&
 			column + 2 < this.board.length &&
 			this.board[row + 1][column + 1] === opponent &&
-			this.board[row + 2][column + 2] === " "
+			this.board[row + 2][column + 2] === this.space
 		) {
 			return true;
 		}
@@ -621,7 +694,7 @@ export class Board {
 			row + 2 < this.board.length &&
 			column - 2 >= 0 &&
 			this.board[row + 1][column - 1] === opponent &&
-			this.board[row + 2][column - 2] === " "
+			this.board[row + 2][column - 2] === this.space
 		) {
 			return true;
 		}

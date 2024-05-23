@@ -2,8 +2,8 @@ import { Board } from "./board";
 import PromptSync from "prompt-sync";
 
 export class GameInterface {
-	private board: Board = new Board();
-	private prompt = PromptSync({
+	private readonly board: Board = new Board();
+	private readonly prompt = PromptSync({
 		sigint: true,
 	});
 
