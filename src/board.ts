@@ -1,4 +1,4 @@
-import { BlobOptions } from "buffer";
+import { BoardAndMovesHistory, BoardHistory } from "./boardAndMovesHistory";
 
 export class Board {
 	private readonly white = "●";
@@ -132,8 +132,10 @@ export class Board {
 		"8": 0,
 	};
 
-	readonly whiteScore: string[] = [];
-	readonly blackScore: string[] = [];
+	whiteScore: string[] = [];
+	blackScore: string[] = [];
+
+	readonly history: BoardAndMovesHistory = new BoardAndMovesHistory();
 
 	rotateBoard(): void {
 		const length = this.board.length;
@@ -444,7 +446,7 @@ export class Board {
 		let indexRow = 0;
 		let indexColumn = 0;
 		let eatableOpponent: string = "";
-        let doesQueenAteSomeone = false;
+		let doesQueenAteSomeone = false;
 
 		if (fromRowIndex < toRowIndex) {
 			indexRow = fromRowIndex + 1;
@@ -455,7 +457,6 @@ export class Board {
 					indexColumn <= toColumnIndex && indexRow <= toRowIndex;
 					indexColumn++
 				) {
-
 					if (
 						this.board[indexRow][indexColumn] === (eatableOpponent = opponentFigure) ||
 						this.board[indexRow][indexColumn] === (eatableOpponent = opponentQueen)
@@ -473,7 +474,7 @@ export class Board {
 								this.board[indexRow + 1][indexColumn + 1] = queenFigure;
 								++indexRow;
 								++indexColumn;
-                                doesQueenAteSomeone = true;
+								doesQueenAteSomeone = true;
 							}
 						}
 					} else if (this.board[indexRow][indexColumn] !== this.space) {
@@ -482,7 +483,7 @@ export class Board {
 						this.board[indexRow - 1][indexColumn - 1] = this.space;
 						this.board[indexRow][indexColumn] = queenFigure;
 					}
-                    
+
 					indexRow++;
 				}
 			} else {
@@ -492,7 +493,6 @@ export class Board {
 					indexColumn >= toColumnIndex && indexRow <= toRowIndex;
 					indexColumn--
 				) {
-                    
 					if (
 						this.board[indexRow][indexColumn] === (eatableOpponent = opponentFigure) ||
 						this.board[indexRow][indexColumn] === (eatableOpponent = opponentQueen)
@@ -510,7 +510,7 @@ export class Board {
 								this.board[indexRow + 1][indexColumn - 1] = queenFigure;
 								++indexRow;
 								--indexColumn;
-                                doesQueenAteSomeone = true;
+								doesQueenAteSomeone = true;
 							}
 						}
 					} else if (this.board[indexRow][indexColumn] !== this.space) {
@@ -548,7 +548,7 @@ export class Board {
 								this.board[indexRow - 1][indexColumn + 1] = queenFigure;
 								--indexRow;
 								++indexColumn;
-                                doesQueenAteSomeone = true;
+								doesQueenAteSomeone = true;
 							}
 						}
 					} else if (this.board[indexRow][indexColumn] !== this.space) {
@@ -584,8 +584,8 @@ export class Board {
 								this.board[indexRow - 1][indexColumn - 1] = queenFigure;
 								--indexRow;
 								--indexColumn;
-                                
-                                doesQueenAteSomeone = true;
+
+								doesQueenAteSomeone = true;
 							}
 						}
 					} else if (this.board[indexRow][indexColumn] !== this.space) {
@@ -598,10 +598,36 @@ export class Board {
 				}
 			}
 		}
-        if (doesQueenAteSomeone && this.queenHasOneMoreStep(indexRow, indexColumn)) {
-            return {everythingOk: true, hasOneMoreStep: true}
-        }
+		if (doesQueenAteSomeone && this.queenHasOneMoreStep(indexRow, indexColumn)) {
+			return { everythingOk: true, hasOneMoreStep: true };
+		}
 		return { everythingOk: true, hasOneMoreStep: false };
+	}
+
+	addToHistory(moves: string) {
+		this.history.push({
+			move: moves,
+			board: this.board.map((row) => row.slice()),
+			whiteScore: this.whiteScore,
+			blackScore: this.blackScore,
+            whosTurn: this.whosTurn
+		});
+	}
+
+	getLastMove(): BoardHistory | null {
+		return this.history.peek();
+	}
+
+	oneStepBack(): boolean {
+		let getBoardHistory: BoardHistory | null = this.history.pop();
+		if (getBoardHistory) {
+			this.board = getBoardHistory.board;
+			this.whiteScore = getBoardHistory.whiteScore;
+			this.blackScore = getBoardHistory.blackScore;
+            this.whosTurn = getBoardHistory.whosTurn;
+			return true;
+		}
+		return false;
 	}
 
 	isQueenAndIsRightQueen(row: string, column: string): boolean {
@@ -723,33 +749,39 @@ export class Board {
 		//right
 		if (row !== 0) {
 			//right up
-            for (
+			for (
 				let rowIndex = row - 1, columnIndex = column + 1;
 				rowIndex > 0 && columnIndex < this.board.length - 1;
 				rowIndex--, columnIndex++
 			) {
 				let checkBox = this.board[rowIndex][columnIndex];
-                let nextCheckBox = this.board[rowIndex - 1][columnIndex + 1];
+				let nextCheckBox = this.board[rowIndex - 1][columnIndex + 1];
 
 				if (checkBox !== this.space) {
-					if ((checkBox === opponent || checkBox === opponentQueen) && nextCheckBox === this.space) {
-                        return true;
-                    }
+					if (
+						(checkBox === opponent || checkBox === opponentQueen) &&
+						nextCheckBox === this.space
+					) {
+						return true;
+					}
 				}
 			}
 			//right down
-            for (
+			for (
 				let rowIndex = row + 1, columnIndex = column + 1;
 				rowIndex < this.board.length - 1 && columnIndex < this.board.length - 1;
 				rowIndex++, columnIndex++
 			) {
 				let checkBox = this.board[rowIndex][columnIndex];
-                let nextCheckBox = this.board[rowIndex + 1][columnIndex + 1];
+				let nextCheckBox = this.board[rowIndex + 1][columnIndex + 1];
 
 				if (checkBox !== this.space) {
-					if ((checkBox === opponent || checkBox === opponentQueen) && nextCheckBox === this.space) {
-                        return true;
-                    }
+					if (
+						(checkBox === opponent || checkBox === opponentQueen) &&
+						nextCheckBox === this.space
+					) {
+						return true;
+					}
 				}
 			}
 		}
@@ -763,27 +795,33 @@ export class Board {
 				rowIndex--, columnIndex--
 			) {
 				let checkBox = this.board[rowIndex][columnIndex];
-                let nextCheckBox = this.board[rowIndex - 1][columnIndex - 1];
+				let nextCheckBox = this.board[rowIndex - 1][columnIndex - 1];
 
 				if (checkBox !== this.space) {
-					if ((checkBox === opponent || checkBox === opponentQueen) && nextCheckBox === this.space) {
-                        return true;
-                    }
+					if (
+						(checkBox === opponent || checkBox === opponentQueen) &&
+						nextCheckBox === this.space
+					) {
+						return true;
+					}
 				}
 			}
 			//left down
-            for (
+			for (
 				let rowIndex = row + 1, columnIndex = column - 1;
 				rowIndex < this.board.length - 1 && columnIndex > 0;
 				rowIndex++, columnIndex--
 			) {
 				let checkBox = this.board[rowIndex][columnIndex];
-                let nextCheckBox = this.board[rowIndex + 1][columnIndex - 1];
+				let nextCheckBox = this.board[rowIndex + 1][columnIndex - 1];
 
 				if (checkBox !== this.space) {
-					if ((checkBox === opponent || checkBox === opponentQueen) && nextCheckBox === this.space) {
-                        return true;
-                    }
+					if (
+						(checkBox === opponent || checkBox === opponentQueen) &&
+						nextCheckBox === this.space
+					) {
+						return true;
+					}
 				}
 			}
 		}

@@ -34,13 +34,25 @@ export class GameInterface {
 			this.clearConsole();
 			console.log(cautionMessage);
 			cautionMessage = "";
-			this.board.display();
+            let lastMove = this.board.getLastMove();
+			console.log("Previous Move:", lastMove ? lastMove.move : 'N/A');
+            this.board.display();
 			console.log(
-				"R - for right, L - for left, RD - for right down, LD - for left down:\nFor Queen you should write 'q' and then both place and direction\n(queen example` qH2 E5)"
+                "For going to previous move type - P",
+                "\nR - for right, L - for left, RD - for right down, LD - for left down:",
+                "\nFor Queen you should write 'q' and then both place and direction",
+                "\n(queen example` qH2 E5)"
 			);
 			const consoleInput = this.prompt("(example` C1 R): - ").trim().toUpperCase();
 
-			if (consoleInput.length === 6) {
+            if (consoleInput.length === 1 && consoleInput === 'P') {
+                if (this.board.oneStepBack()) {
+                    continue;
+                } else {
+                    cautionMessage = "The history is empty!!!"
+                    continue;
+                }
+            } else if (consoleInput.length === 6) {
 				//if queen move
 				if (consoleInput.charAt(0) === "Q") {
 					const comandsArr: string[] = consoleInput.split(" ");
@@ -69,7 +81,10 @@ export class GameInterface {
                         continue;
                     }
 
+                    this.board.addToHistory(`q${fromRow}${fromColumn}, ${toRow}${toColumn}`);
+
                     goToNextPlayer = this.board.queenMove(fromRow, fromColumn, toRow, toColumn);
+                    
 				}
 			} else {
 				if (!(consoleInput.length >= 4 && consoleInput.length <= 5)) {
@@ -95,6 +110,8 @@ export class GameInterface {
 						continue;
 					}
 				}
+
+                this.board.addToHistory(`${row}${column}, ${comandsArr[1]}`);
 
 				switch (comandsArr[1]) {
 					case "R": {
@@ -122,6 +139,7 @@ export class GameInterface {
 						console.log("WRONG KEY!!");
 					}
 				}
+
 			}
 			if (goToNextPlayer.hasOneMoreStep) {
 				cautionMessage = "You have one more step";
@@ -129,6 +147,7 @@ export class GameInterface {
 				this.board.rotateBoard();
 			} else {
 				cautionMessage = "WRONG OPERATION!!!";
+                this.board.oneStepBack();
 			}
 		}
 	}
