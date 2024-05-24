@@ -9,16 +9,16 @@ export type BoardHistory = {
 export class BoardAndMovesHistory {
 
     private readonly boardHistory: BoardHistory[] = [];
-    private size: number = 0;
+    private _size: number = 0;
 
     push(element: BoardHistory): void {
-        this.size++; 
+        this._size++; 
         this.boardHistory.push(element);
     }
 
     pop(): BoardHistory | null  {
         if (!this.isEmpty() ) {
-            this.size--;
+            this._size--;
             return this.boardHistory.pop()!    
         }
         return null;
@@ -29,11 +29,36 @@ export class BoardAndMovesHistory {
             return null;
         }
 
-        return this.boardHistory[this.size - 1]
+        return this.boardHistory[this._size - 1]
     }
 
     isEmpty(): boolean {
-        return this.size === 0;
+        return this._size === 0;
+    }
+
+    getByIndex(index: number): BoardHistory | null {
+
+        if (this.isEmpty() || index >= this._size || index < 0) {
+            return null;
+        }
+
+        let result = this.boardHistory[index];
+        let lastIndex: number = this._size - 1;
+
+        while (lastIndex >= index) {
+            this.pop();
+            lastIndex--;
+        }
+
+        return result;
+    }
+
+    getAllMovesHistory(): BoardHistory[] | null {
+        return this.isEmpty() ? null : this.boardHistory;
+    }
+
+    get size(): number {
+        return this._size;
     }
 
 }

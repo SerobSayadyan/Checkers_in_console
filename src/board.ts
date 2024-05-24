@@ -135,7 +135,7 @@ export class Board {
 	whiteScore: string[] = [];
 	blackScore: string[] = [];
 
-	readonly history: BoardAndMovesHistory = new BoardAndMovesHistory();
+	private readonly history: BoardAndMovesHistory = new BoardAndMovesHistory();
 
 	rotateBoard(): void {
 		const length = this.board.length;
@@ -608,9 +608,9 @@ export class Board {
 		this.history.push({
 			move: moves,
 			board: this.board.map((row) => row.slice()),
-			whiteScore: this.whiteScore,
-			blackScore: this.blackScore,
-            whosTurn: this.whosTurn
+			whiteScore: this.whiteScore.map((index) => index.slice()),
+			blackScore: this.blackScore.map((index) => index.slice()),
+			whosTurn: this.whosTurn,
 		});
 	}
 
@@ -624,11 +624,23 @@ export class Board {
 			this.board = getBoardHistory.board;
 			this.whiteScore = getBoardHistory.whiteScore;
 			this.blackScore = getBoardHistory.blackScore;
-            this.whosTurn = getBoardHistory.whosTurn;
+			this.whosTurn = getBoardHistory.whosTurn;
 			return true;
 		}
 		return false;
 	}
+
+    goToIndexStepBack(index: number): boolean {
+        let getBoardHistory: BoardHistory | null = this.history.getByIndex(index);
+        if (getBoardHistory) {
+			this.board = getBoardHistory.board;
+			this.whiteScore = getBoardHistory.whiteScore;
+			this.blackScore = getBoardHistory.blackScore;
+			this.whosTurn = getBoardHistory.whosTurn;
+			return true;
+		}
+		return false;
+    }
 
 	isQueenAndIsRightQueen(row: string, column: string): boolean {
 		const isWhitesTurn = this.whosTurn === this.white;
@@ -655,6 +667,8 @@ export class Board {
 		if (isBlacksTurn) {
 			alphabetIndex = this.board.length - 1;
 		}
+		const movesArr: BoardHistory[] | null = this.history.getAllMovesHistory();
+
 		for (let row = 0; row < this.board.length; row++) {
 			for (let column = -1; column < this.board.length; column++) {
 				if (column === -1) {
@@ -663,7 +677,14 @@ export class Board {
 					str = str.concat(`[${this.board[row][column]}]`);
 				}
 			}
-
+			//showing on right side all previous moves
+			if (movesArr) {
+				let movesArrIndex = row;
+				while (movesArrIndex < this.history.size) {
+					str = str.concat(`\t${movesArrIndex + 1}: ${movesArr[movesArrIndex].whosTurn} ${movesArr[movesArrIndex].move}`);
+					movesArrIndex += this.board.length;
+				}
+			}
 			str = str.concat("\n");
 		}
 

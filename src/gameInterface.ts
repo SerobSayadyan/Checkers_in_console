@@ -39,6 +39,7 @@ export class GameInterface {
             this.board.display();
 			console.log(
                 "For going to previous move type - P",
+                "\nFor going to move of specific index write 'h' and than the index (example` h 8)",
                 "\nR - for right, L - for left, RD - for right down, LD - for left down:",
                 "\nFor Queen you should write 'q' and then both place and direction",
                 "\n(queen example` qH2 E5)"
@@ -52,7 +53,21 @@ export class GameInterface {
                     cautionMessage = "The history is empty!!!"
                     continue;
                 }
-            } else if (consoleInput.length === 6) {
+            } else if (consoleInput.charAt(0) === 'H') {
+                const comandsArr: string[] = consoleInput.split(" ");
+                const indexOfHistory: string = comandsArr[1];
+                let index: number;
+                if (index = Number(indexOfHistory)) {
+                    if(!this.board.goToIndexStepBack(index - 1)) {
+                        cautionMessage = 'WRONG INDEX OR HISTORY IS EMPTY!!!'
+                    }
+                    continue;
+                } else {
+                    cautionMessage = `'${indexOfHistory}' is not an index!!!`
+                    continue;
+                }
+            }
+            else if (consoleInput.length === 6) {
 				//if queen move
 				if (consoleInput.charAt(0) === "Q") {
 					const comandsArr: string[] = consoleInput.split(" ");
