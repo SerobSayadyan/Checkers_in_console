@@ -1,4 +1,5 @@
 import { BoardAndMovesHistory, BoardHistory } from "./boardAndMovesHistory";
+import kleur from "kleur";
 
 export class Board {
 	private readonly white = "●";
@@ -661,7 +662,8 @@ export class Board {
 		const alphabet: string[] = ["H", "G", "F", "E", "D", "C", "B", "A"];
 		let alphabetIndex = 0;
 
-		str = str.concat(`${this.whosTurn === this.black ? "\tBlacks turn" : "\tWhites turn"}\n`);
+
+		str = str.concat(`${this.whosTurn === this.black ? kleur.bgRed(kleur.black("\tBlacks turn")) : kleur.bgRed(kleur.white("\tWhites turn"))}\n`);
 
 		const isBlacksTurn = this.whosTurn === this.black;
 		if (isBlacksTurn) {
@@ -681,7 +683,7 @@ export class Board {
 			if (movesArr) {
 				let movesArrIndex = row;
 				while (movesArrIndex < this.history.size) {
-					str = str.concat(`\t${movesArrIndex + 1}: ${movesArr[movesArrIndex].whosTurn} ${movesArr[movesArrIndex].move}`);
+					str = str.concat(`  ${movesArrIndex + 1}: ${movesArr[movesArrIndex].whosTurn} ${movesArr[movesArrIndex].move}`);
 					movesArrIndex += this.board.length;
 				}
 			}

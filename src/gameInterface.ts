@@ -1,5 +1,6 @@
 import { Board } from "./board";
 import PromptSync from "prompt-sync";
+import kleur from "kleur";
 
 export class GameInterface {
 	private readonly board: Board = new Board();
@@ -8,8 +9,8 @@ export class GameInterface {
 	});
 
 	start(): void {
-		console.log("Start the game");
-		switch (this.prompt("Type any character to start or 'N' to exit: ").trim().toLowerCase()) {
+		console.log(kleur.bgRed("Start the game"));
+		switch (this.prompt(kleur.bgRed("Type any character to start or 'N' to exit: ")).trim().toLowerCase()) {
 			case "n": {
 				break;
 			}
@@ -37,13 +38,13 @@ export class GameInterface {
             let lastMove = this.board.getLastMove();
 			console.log("Previous Move:", lastMove ? lastMove.move : 'N/A');
             this.board.display();
-			console.log(
-                "For going to previous move type - P",
-                "\nFor going to move of specific index write 'h' and than the index (example` h 8)",
-                "\nR - for right, L - for left, RD - for right down, LD - for left down:",
-                "\nFor Queen you should write 'q' and then both place and direction",
-                "\n(queen example` qH2 E5)"
-			);
+			console.log(kleur.yellow(
+                "For going to previous move type - P" +
+                "\nFor going to move of specific index write 'P' and than the index (example` p 8)" +
+                "\nR - for right, L - for left, RD - for right down, LD - for left down:" +
+                "\nFor Queen you should write 'q' and then both place and direction" +
+                "\n(queen example` qH2 E5)")
+            );
 			const consoleInput = this.prompt("(example` C1 R): - ").trim().toUpperCase();
 
             if (consoleInput.length === 1 && consoleInput === 'P') {
@@ -53,7 +54,7 @@ export class GameInterface {
                     cautionMessage = "The history is empty!!!"
                     continue;
                 }
-            } else if (consoleInput.charAt(0) === 'H') {
+            } else if (consoleInput.charAt(0) === 'P') {
                 const comandsArr: string[] = consoleInput.split(" ");
                 const indexOfHistory: string = comandsArr[1];
                 let index: number;
