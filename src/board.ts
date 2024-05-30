@@ -1,6 +1,8 @@
 import { BoardAndMovesHistory, BoardHistory } from "./boardAndMovesHistory";
 import kleur from "kleur";
 
+export type BoardBoxTypes = "●" | "○" | "⛃" | "⛁" | " ";
+
 export class Board {
 	private readonly white = "●";
 	private readonly black = "○";
@@ -10,7 +12,7 @@ export class Board {
 
 	private whosTurn = this.white;
 
-	private board: string[][] = [
+	private board: BoardBoxTypes[][] = [
 		[
 			this.space,
 			this.black,

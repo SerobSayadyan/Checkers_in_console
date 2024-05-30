@@ -1,6 +1,8 @@
+import { BoardBoxTypes } from "./board";
+
 export type BoardHistory = {
     move: string
-    board: string[][]
+    board: BoardBoxTypes[][]
     whiteScore: string[];
     blackScore: string[];
     whosTurn: string;
